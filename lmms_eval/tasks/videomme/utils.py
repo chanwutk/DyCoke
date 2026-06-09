@@ -215,7 +215,7 @@ def videomme_doc_to_text_subtitle(doc, lmms_eval_specific_kwargs=None):
     cache_dir = os.path.join(base_cache_dir, cache_name)
     video_path = doc["videoID"] + ".mp4"
     subtitle_path = os.path.join(cache_dir, "subtitle", doc["videoID"] + ".srt")
-    video_path = os.path.join(cache_dir, video_path)
+    video_path = os.path.join(cache_dir, "data", video_path)
     if os.path.exists(subtitle_path):  # Denote have subtitle
         subtitle = open(subtitle_path).readlines()
     else:
