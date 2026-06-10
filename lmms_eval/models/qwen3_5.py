@@ -30,7 +30,7 @@ from lmms_eval.api.registry import register_model
 warnings.filterwarnings("ignore")
 eval_logger = logging.getLogger("lmms-eval")
 torch.backends.cuda.matmul.allow_tf32 = True
-torch.backends.cuda.enable_cudnn_sdp(False)
+torch.backends.cudnn.enabled = False
 
 
 @register_model("qwen3_5")
