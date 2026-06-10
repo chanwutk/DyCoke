@@ -66,7 +66,8 @@ class LlavaQwenForCausalLM(Qwen2ForCausalLM, LlavaMetaForCausalLM):
         self.post_init()
 
         self.dycoke = None
-        
+        self.lengeh_vision_token = None
+
         self.dycoke_configs = DycokeConfigs()
 
     def init_dycoke(self):
