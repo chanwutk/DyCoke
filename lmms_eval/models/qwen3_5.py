@@ -206,7 +206,15 @@ class Qwen3_5(lmms):
                 frames = [Image.open(os.path.join(path, f)).convert("RGB") for f in frame_files]
                 return {"type": "video", "video": frames}
             else:
-                return {"type": "video", "video": path}
+                # Load video via decord (torchvision.io.read_video unavailable).
+                from decord import VideoReader, cpu
+                vr = VideoReader(path, ctx=cpu(0))
+                total = len(vr)
+                n = self.max_frames_num or total
+                indices = np.linspace(0, total - 1, min(n, total), dtype=int)
+                frames_np = vr.get_batch(indices.tolist()).asnumpy()
+                frames = [Image.fromarray(f) for f in frames_np]
+                return {"type": "video", "video": frames}
         elif isinstance(path, Image.Image):
             # List of PIL images treated as video frames.
             frames = list(visual) if isinstance(visual, list) else [visual]
