@@ -45,6 +45,7 @@ class Qwen3_5(lmms):
         device_map: Optional[str] = "cuda:0",
         use_cache: Optional[bool] = True,
         max_frames_num: Optional[int] = None,
+        max_pixels: Optional[int] = None,
         attn_implementation: Optional[str] = "eager",
         **kwargs,
     ) -> None:
@@ -86,6 +87,16 @@ class Qwen3_5(lmms):
                 self._processor.video_processor.min_frames, self.max_frames_num
             )
             eval_logger.info(f"Video processor max_frames overridden to {self.max_frames_num}")
+
+        # Override max_pixels to cap per-frame resolution.
+        # Qwen3.5 defaults to near-native resolution (~880 tokens/group at 720p).
+        # Setting max_pixels=147456 (384*384) matches LLaVA-OV's spatial budget.
+        if max_pixels is not None:
+            self._processor.image_processor.max_pixels = max_pixels
+            self._processor.image_processor.min_pixels = min(
+                self._processor.image_processor.min_pixels, max_pixels
+            )
+            eval_logger.info(f"Image processor max_pixels overridden to {max_pixels}")
 
         self._model.eval()
         self._config = self._model.config
