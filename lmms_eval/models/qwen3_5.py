@@ -92,12 +92,15 @@ class Qwen3_5(lmms):
         # Qwen3.5 defaults to near-native resolution (~880 tokens/group at 720p).
         # The processor uses size.longest_edge as the max pixel budget per frame.
         # Setting to 147456 (384*384) matches LLaVA-OV's spatial budget.
+        # NOTE: video inputs route through video_processor, not image_processor —
+        # both must be overridden, otherwise video frames bypass the cap.
         if max_pixels is not None:
-            self._processor.image_processor.size["longest_edge"] = max_pixels
-            self._processor.image_processor.size["shortest_edge"] = min(
-                self._processor.image_processor.size["shortest_edge"], max_pixels
+            for proc in (self._processor.image_processor, self._processor.video_processor):
+                proc.size["longest_edge"] = max_pixels
+                proc.size["shortest_edge"] = min(proc.size["shortest_edge"], max_pixels)
+            eval_logger.info(
+                f"Image+video processor max_pixels overridden to {max_pixels}"
             )
-            eval_logger.info(f"Image processor max_pixels overridden to {max_pixels}")
 
         self._model.eval()
         self._config = self._model.config
