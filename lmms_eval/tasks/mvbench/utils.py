@@ -85,9 +85,10 @@ def mvbench_frames_doc_to_visual(doc, lmms_eval_specific_kwargs=None):
     else:
         eval_logger.error(f"Video path: {video_path} does not exist, please check.")
 
-    frame_path_list = [os.path.join(video_path, f) for f in os.listdir(video_path) if f.endswith(".jpg") or f.endswith(".png")]
-    frame_image_list = [PIL.Image.open(frame_path).convert("RGB") for frame_path in frame_path_list]
-    return frame_image_list
+    # Return as a path string (like mvbench_doc_to_visual) so the model
+    # wrapper treats it as video, not multi-image. The model's load_video
+    # handles directories by loading sampled frames from disk.
+    return [video_path]
 
 
 def mvbench_doc_to_text(doc, lmms_eval_specific_kwargs=None):

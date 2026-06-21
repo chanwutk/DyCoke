@@ -32,6 +32,7 @@ AVAILABLE_MODELS = {
     "minicpm_v": "MiniCPM_V",
     "mplug_owl_video": "mplug_Owl",
     "phi3v": "Phi3v",
+    "qwen3_5": "Qwen3_5",
     "qwen_vl": "Qwen_VL",
     "qwen_vl_api": "Qwen_VL_API",
     "reka": "Reka",

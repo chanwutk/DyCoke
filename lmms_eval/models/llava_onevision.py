@@ -2,6 +2,7 @@ import copy
 import json
 import logging
 import math
+import os
 import re
 import warnings
 from datetime import timedelta
@@ -381,9 +382,23 @@ class Llava_OneVision(lmms):
 
     def load_video(self, video_path, max_frames_num):
         if type(video_path) == str:
-            vr = VideoReader(video_path, ctx=cpu(0))
+            path = video_path
         else:
-            vr = VideoReader(video_path[0], ctx=cpu(0))
+            path = video_path[0]
+
+        # Handle frame directories (e.g. TVQA in MVBench episodic_reasoning).
+        if os.path.isdir(path):
+            frame_files = sorted(
+                f for f in os.listdir(path)
+                if f.lower().endswith((".jpg", ".jpeg", ".png"))
+            )
+            total_frame_num = len(frame_files)
+            indices = np.linspace(0, total_frame_num - 1, max_frames_num, dtype=int).tolist()
+            from PIL import Image
+            frames = [np.array(Image.open(os.path.join(path, frame_files[i])).convert("RGB")) for i in indices]
+            return np.stack(frames)
+
+        vr = VideoReader(path, ctx=cpu(0))
         total_frame_num = len(vr)
         uniform_sampled_frames = np.linspace(0, total_frame_num - 1, max_frames_num, dtype=int)
         frame_idx = uniform_sampled_frames.tolist()

@@ -95,6 +95,8 @@ class PrunableDynamicCache(DynamicCache):
         self.kv_cache = keep_indexs.tolist()
 
     def dycoke_pruning(self, attn, layer_idx, config):
+        if config.image_token_length is None:
+            return
         attention_avg = attn[1].mean(1)[0, -1]
         start_idx = config.image_token_start_index
         img_len = config.image_token_length

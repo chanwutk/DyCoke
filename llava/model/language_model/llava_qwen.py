@@ -66,7 +66,8 @@ class LlavaQwenForCausalLM(Qwen2ForCausalLM, LlavaMetaForCausalLM):
         self.post_init()
 
         self.dycoke = None
-        
+        self.lengeh_vision_token = None
+
         self.dycoke_configs = DycokeConfigs()
 
     def init_dycoke(self):
@@ -80,6 +81,12 @@ class LlavaQwenForCausalLM(Qwen2ForCausalLM, LlavaMetaForCausalLM):
         self.dycoke_configs.dycoke_layer_idx = self.dycoke_l
         self.dycoke_configs.image_token_start_index = self.image_token_start_index
         self.dycoke_configs.dycoke_radio = self.dycoke_p
+        # Reset per-sample state so stale attention scores from the previous
+        # sample don't cause a shape mismatch in cosine_similarity when
+        # image_token_length differs across videos (common in MVBench).
+        self.dycoke_configs.attention_score = None
+        self.dycoke_configs.similarity = None
+        self.dycoke_configs.image_token_length = None
         self.model.DycokeConfig = self.dycoke_configs
 
     def get_model(self):
